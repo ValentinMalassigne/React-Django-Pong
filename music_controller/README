@@ -1,0 +1,35 @@
+Pour lancer :
+
+1 Lancer le serve django :
+cd music_controller
+python manage.py runserver (python3 sur mac)
+
+2 lancer react
+cd music_controller/frontend
+npm run dev
+
+3 Lancer l'immage docker de redis
+docker run --rm -p 6379:6379 redis:7
+
+
+Pour aller sur pong :
+http://127.0.0.1:8000/ et cliquer sur pong
+
+ou directement :
+
+http://127.0.0.1:8000/pong
+
+On peut donner n'importe quelle code pour une room
+
+On peut connecter plusieurs fenêtres sur la même room
+
+Mais il ne faut pas cliquer plusieurs fois sur le bouton start
+
+
+Pour coder :
+
+le front du pong est dans music_controller/frontend/src/components/Pong
+
+le css est dans : music_controller/frontend/static/css
+
+le back du pong est dans music_controller/pong
