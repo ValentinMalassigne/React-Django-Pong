@@ -61,7 +61,7 @@ const CreateRoomPage = ({ update, votesToSkip, guestCanPause, roomCode, updateCa
 			</Button>
 		</Grid>
 			<Grid item xs={12} align="center">
-				<Button color="secondary" variant="contained" to="/" component={Link}>
+				<Button variant="contained" color="secondary" to="/music-home" component={Link}>
 					Back
 				</Button>
 			</Grid>

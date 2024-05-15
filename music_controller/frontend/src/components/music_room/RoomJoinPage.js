@@ -66,7 +66,7 @@ const RoomJoinPage = () => {
 				</Button>
 			</Grid>
 			<Grid item xs={12} align="center">
-				<Button variant="contained" color="secondary" to="/" component={Link}>
+				<Button variant="contained" color="secondary" to="/music-home" component={Link}>
 					Back
 				</Button>
 			</Grid>

@@ -9,7 +9,8 @@ urlpatterns = [
 	path('create', index),
 	path('room/<str:roomCode>', index),
 	path('pong/', index),
+	path('pong-join', index),
+	path('pong-create', index),
 	path('pong/<str:roomCode>', index),
 	path('ponglocal', index),
-	
 ]

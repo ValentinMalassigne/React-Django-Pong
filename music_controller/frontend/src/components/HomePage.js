@@ -8,6 +8,8 @@ import MusicHomePage from "./music_room/MusicHome";
 import RoomJoinPage from "./music_room/RoomJoinPage";
 import CreateRoomPage from "./music_room/CreateRoomPage";
 import Room from "./music_room/Room";
+import PongHomePage from "./Pong/PongHome";
+import CreatePongRoomPage from "./Pong/CreatePongRoomPage";
 
 
 export default class HomePage extends Component {
@@ -74,7 +76,9 @@ export default class HomePage extends Component {
 					<Route path="/create" element={<CreateRoomPage />} />
 					<Route path="/room/:roomCode" element={<Room leaveRoomCallback={this.clearRoomCode} />} />
 					{/* PONG */}
-					<Route path="/pong" element={<JoinPongPage />} />
+					<Route path="/pong" element={<PongHomePage />} />
+					<Route path="/pong-join" element={<JoinPongPage />} />
+					<Route path="/pong-create" element={<CreatePongRoomPage />} />
 					<Route path="/pong/:roomCode" element={<Pong />} />
 					<Route path="/ponglocal" element={<PongLocal />} />
 				</Routes>

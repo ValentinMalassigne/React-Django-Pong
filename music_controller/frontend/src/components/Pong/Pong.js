@@ -5,11 +5,12 @@ const Pong = () => {
 	const params = useParams();
 	const initialBallState = { x: 290, y: 190, speedX: 5, speedY: 5 };
 	const initialPaddleState = { left: 150, right: 150 };
-	const playerCount = 1;
+	const playerCount = 2;
 	const [ball, setBall] = useState(initialBallState);
 	const [paddles, setPaddles] = useState(initialPaddleState);
 	const [gameOver, setGameOver] = useState(false);
 	const [gameRunning, setGameRunning] = useState(false);
+	const [player_side, setPlayerSide] = useState(); //left, right or spectator
 	const ballRef = useRef(null);
 	const socketRef = useRef(null);
 
@@ -17,7 +18,7 @@ const Pong = () => {
 		socketRef.current = new WebSocket('ws://localhost:8000/ws/pong/' + params.roomCode + '/');
 
 		socketRef.current.onopen = () => {
-			// socketRef.current.send(JSON.stringify({ type: 'start_game' }));
+			socketRef.current.send(JSON.stringify({ type: 'join_game' }));
 		};
 
 		socketRef.current.onerror = (error) => {
@@ -30,52 +31,51 @@ const Pong = () => {
 
 	useEffect(() => {
 		const handleKeyPress = (e) => {
+			if (player_side === 'spectator' || !gameRunning) {
+				return;
+			}
 			switch (e.key) {
 				case 'ArrowUp':
-					socketRef.current.send(JSON.stringify({ type: 'update_paddle', side: "left", direction: "up" }));
-					setPaddles({ ...paddles, left: paddles.left - 10 });
+					socketRef.current.send(JSON.stringify({ type: 'update_paddle', side: player_side, direction: "up" }));
+					player_side === "left" ? setPaddles({ ...paddles, left: Math.max(paddles.left - 10, 0) }) : setPaddles({ ...paddles, right: Math.max(paddles.right - 10, 0) });
 					break;
 				case 'ArrowDown':
-					socketRef.current.send(JSON.stringify({ type: 'update_paddle', side: "left", direction: "down" }));
-					setPaddles({ ...paddles, left: paddles.left + 10 });
+					socketRef.current.send(JSON.stringify({ type: 'update_paddle', side: player_side, direction: "down" }));
+					player_side === "left" ? setPaddles({ ...paddles, left: Math.min(paddles.left + 10, 300) }) : setPaddles({ ...paddles, right: Math.min(paddles.right + 10, 300) });
 					break;
 				default:
 					break;
 			}
-			if (playerCount === 2) {
-				switch (e.key) {
-					case 'u':
-						socketRef.current.send(JSON.stringify({ type: 'update_paddle', side: "right", direction: "up" }));
-						setPaddles({ ...paddles, right: paddles.right - 10 });
-						break;
-					case 'd':
-						socketRef.current.send(JSON.stringify({ type: 'update_paddle', side: "right", direction: "down" }));
-						setPaddles({ ...paddles, right: paddles.right + 10 });
-						break;
-					default:
-						break;
-				}
-			}
-
 		};
 
 		//très import qu'il soit dans un useEffect qui dépend de paddles
 		socketRef.current.onmessage = (event) => {
 			const data = JSON.parse(event.data);
-			if (data.type === 'game_state') {
+			if (data.type === 'game_start') {
+				setGameRunning(true);
+				setGameOver(false);
+				setBall(initialBallState);
+				setPaddles(initialPaddleState);
+			} else if (data.type === 'game_state') {
 				const { x, y } = data.ball_position;
 				// const leftPaddle = data.left_paddle_position;
 				const rightPaddle = data.right_paddle_position;
+				const leftPaddle = data.left_paddle_position;
 				setBall({ x, y });
-				setPaddles({ ...paddles, right: rightPaddle });
+				setPaddles({ left: leftPaddle, right: rightPaddle });
 			} else if (data.type === 'game_over') {
 				setGameRunning(false);
 				setGameOver(true);
 				setBall(initialBallState);
 				setPaddles(initialPaddleState);
+			} else if (data.type == "join_game") {
+				setPlayerSide(data.side);
+				if (data.side === 'spectator') {
+					window.removeEventListener('keydown', handleKeyPress);
+				}
 			}
 			else {
-				console.log('Unknown message type', data.type);
+				console.log('Unknown message type', data);
 			}
 		};
 
@@ -84,33 +84,35 @@ const Pong = () => {
 		return () => {
 			window.removeEventListener('keydown', handleKeyPress);
 		};
-	}, [paddles, socketRef]);
+	}, [paddles, socketRef, player_side]);
 
 	const startGame = () => {
-		if (!gameRunning) {
-			socketRef.current.send(JSON.stringify({ type: 'start_game', nb_players: playerCount }));
+		if (!gameRunning && (player_side === 'left' || player_side === 'right')) {
+			socketRef.current.send(JSON.stringify({ type: 'start_game' }));
 			setGameRunning(true);
 			setGameOver(false);
 		}
-
 	};
 
 	const restartGame = () => {
-		setBall(initialBallState);
-		setPaddles(initialPaddleState);
-		setGameOver(false);
-		setGameRunning(true);
-		socketRef.current.send(JSON.stringify({ type: 'restart', nb_players: playerCount }));
-
+		if ((player_side === 'left' || player_side === 'right')) {
+			setBall(initialBallState);
+			setPaddles(initialPaddleState);
+			setGameOver(false);
+			setGameRunning(true);
+			socketRef.current.send(JSON.stringify({ type: 'restart', nb_players: playerCount }));
+		}
 	};
 
 	const pauseGame = () => {
-		socketRef.current.send(JSON.stringify({ type: 'pause' }));
-
+		if (player_side === 'left' || player_side === 'right') {
+			socketRef.current.send(JSON.stringify({ type: 'pause' }));
+		}
 	};
 
 	return (<>
-		<p>Ball x : {ball.x}</p>
+		<h2>Room code : {params.roomCode}</h2>
+		<p>player side : {player_side}</p>
 		<p>paddle right y : {paddles.right}</p>
 		<p>paddle left y : {paddles.left}</p>
 		<div className="controls">
