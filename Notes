@@ -1,0 +1,51 @@
+- Pouvoir bouger les paddle OK
+
+- Avoir collision avec les paddles OK
+
+- Lancer la game avec le start button OK
+- Avoir une fin de game OK
+- Mettre en pause la game (utile en cas de déco) OK
+
+- Pouvoir jouer à 2 paddles sur 1 fenetre ? OK
+
+- Lancer 2 games sur deux fenetres differentes OK
+
+donc la acctuelement on peut être 2 co à la même game
+
+et pour chaque connection a un websocket aka un channel on a un pong consummer
+et tout le monde peut se passer des msg via le group
+
+donc acctuelement chacun peut lancer sa game, c'est juste que comme les msg sont partagées eh bah ils peuvent observé la même (ou deux a la fois)
+
+- TODO
+	- Position de ball et de paddle pas limité dans l'espace
+
+	- Pouvoir jouer sur 2 navigateurs a la meme partie
+
+
+- BUGS
+	- Fix les pb visuel de rebond sur les murs / paddles
+		- Tester la méthode ne n'envoyer que les prochains points de collisions
+		- Ou alors juste quand il y a une update du jeu ? paddle qui bouge / rebond de la balle
+		- Si au start la ball part vers le bas, alors impossible de la renvoyer, game over
+
+	- Bug si un client fait plusieurs call_start game, ça lance plusieurs game sur le même serveur
+
+
+Pour chat on a un des websockets pour chaque url différent
+chaque page ouvre une connection au socket et rejoins le groupe des connections de ce socket
+
+Pour music_room on a une class donnée dans la ram du serveur qui stock les rooms et qui en est host
+les pages font les requests et les views regardent la classe donée pour savoir quoi faire
+
+
+
+le client se connecte avec un room name
+
+il envoie join_game
+	si room existe => essayer de rejoindre en player => sinon spectateur
+	sinon en créer une
+
+
+Sécu les paddle en local
+envoyé la pose du paddle de gauche aussi

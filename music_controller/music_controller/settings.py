@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-$=6fgk!k6vmfms4m2w8&dfex4ssvo+2#1vm9y5zt7-+-bb)mpo
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["0.0.0.0", "127.0.0.1"]
 
 
 # Application definition
@@ -34,7 +34,6 @@ INSTALLED_APPS = [
 	'daphne',
 	'channels',
 	'chat',
-	'pong',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
 	'api.apps.ApiConfig',
 	'rest_framework',
 	'frontend.apps.FrontendConfig',
+	'pong',
 ]
 
 MIDDLEWARE = [

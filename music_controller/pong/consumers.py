@@ -3,7 +3,8 @@ import json
 
 from channels.generic.websocket import AsyncWebsocketConsumer
 from asgiref.sync import sync_to_async
-from .models import PongRoom
+from django.apps import apps
+
 from .manage_game import game_loop
 
 class PongConsumer(AsyncWebsocketConsumer):     
@@ -46,6 +47,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await self.restart_game(event=text_data_json)
 
     async def create_game(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         text_data_json = event
         
         room_result = await sync_to_async(PongRoom.objects.filter)(code=self.room_name)
@@ -58,6 +60,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         await self.send_message({"message": "Room Created!"})
 
     async def join_game(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         code = self.room_name
         room_result = await sync_to_async(PongRoom.objects.filter)(code=code)
         
@@ -78,6 +81,7 @@ class PongConsumer(AsyncWebsocketConsumer):
                 await self.send_message({"message" : {"type" : "join_game", "side": "spectator"}})
 
     async def restart_game(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         room_result = await sync_to_async(PongRoom.objects.filter)(code=self.room_name)
         if not await sync_to_async(room_result.exists)():
             await self.send_message({"message": "Room not found"})
@@ -90,6 +94,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         self.start_game(event=event)
 
     async def pause_game(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         room_result = await sync_to_async(PongRoom.objects.filter)(code=self.room_name)
         if not await sync_to_async(room_result.exists)():
             await self.send_message({"message": "Room not found"})
@@ -98,6 +103,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         room.pause = not room.pause
 
     async def update_paddle(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         room_result = await sync_to_async(PongRoom.objects.filter)(code=self.room_name)
         if not await sync_to_async(room_result.exists)():
             await self.send_message({"message": "Room not found"})
@@ -129,6 +135,7 @@ class PongConsumer(AsyncWebsocketConsumer):
         await sync_to_async(room.save)()
 
     async def start_game(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         room_result = await sync_to_async(PongRoom.objects.filter)(code=self.room_name)
         if not await sync_to_async(room_result.exists)():
             await self.send_message({"message": "Room not found"})
@@ -142,7 +149,6 @@ class PongConsumer(AsyncWebsocketConsumer):
                     self.room_group_name, {"type": "send_message", "message":  {"type":"game_start"}}
         )
         asyncio.ensure_future(game_loop(self=self, event=event))
-
 
     # Receive a message to send to the client
     async def send_message(self, event):

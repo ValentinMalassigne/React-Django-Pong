@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 
 const Pong = () => {
 	const params = useParams();
-	const initialBallState = { x: 290, y: 190, speedX: 5, speedY: 5 };
+	const initialBallState = { x: 290, y: 190 };
 	const initialPaddleState = { left: 150, right: 150 };
 	const playerCount = 2;
 	const [ball, setBall] = useState(initialBallState);
@@ -58,7 +58,6 @@ const Pong = () => {
 				setPaddles(initialPaddleState);
 			} else if (data.type === 'game_state') {
 				const { x, y } = data.ball_position;
-				// const leftPaddle = data.left_paddle_position;
 				const rightPaddle = data.right_paddle_position;
 				const leftPaddle = data.left_paddle_position;
 				setBall({ x, y });

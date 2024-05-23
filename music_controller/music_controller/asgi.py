@@ -16,8 +16,6 @@ from channels.security.websocket import AllowedHostsOriginValidator
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'music_controller.settings')
 
-django_asgi_application = get_asgi_application()
-
 from chat.routing import websocket_urlpatterns
 from pong.routing import pong_websocket_urlpatterns
 

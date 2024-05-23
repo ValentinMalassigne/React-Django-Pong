@@ -2,12 +2,14 @@ import random
 import asyncio
 import json
 from asgiref.sync import sync_to_async
-from .models import PongRoom
+
+from django.apps import apps
 
 # Faire une partie autonome avec 2 bots
     # Concidérer que le x et y de la balle sont le haut gauche de la balle, et donc tapper les murs bas et droit à BALL_DIAMETER de distance
     # le y du paddle est le haut du paddle
 async def game_loop(self, event):
+        PongRoom = apps.get_model('pong', 'PongRoom')
         MAP_HEIGHT = 400
         MAP_WIDTH = 600
         BALL_DIAMETER = 20
