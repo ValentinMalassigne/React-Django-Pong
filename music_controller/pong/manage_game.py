@@ -1,7 +1,7 @@
 import random
 import asyncio
 from asgiref.sync import sync_to_async
-import datetime
+import time
 
 from django.apps import apps
 
@@ -28,7 +28,7 @@ async def game_loop(self, event):
         await sync_to_async(room.save)()
 
         await self.channel_layer.group_send(
-            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position,  "timestamp": datetime.datetime.now().isoformat()}}
+            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position,  "timestamp": time.time()}}
         )
 
         while True:
@@ -51,12 +51,12 @@ async def game_loop(self, event):
             if left_paddle_position != room.left_paddle_position:
                 left_paddle_position = room.left_paddle_position
                 await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position}}
+                    self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position, "timestamp": time.time()}}
                 )
             if room.player_limit == 2 and right_paddle_position != room.right_paddle_position:
                 right_paddle_position = room.right_paddle_position
                 await self.channel_layer.group_send(
-                    self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position}}
+                    self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position, "timestamp": time.time()}}
                 )
         
             # Ball movement
@@ -83,26 +83,26 @@ async def game_loop(self, event):
             if room.player_limit < 2:
                 # right paddle AI
                 if  ball_direction["x"] > 0 and ball_position["x"] > 300 :
-                    if ball_position["y"] > right_paddle_position + (PADDLE_HEIGHT / 2) :
+                    if ball_position["y"] > right_paddle_position + (PADDLE_HEIGHT / 2) and right_paddle_position < MAP_HEIGHT - PADDLE_HEIGHT:
                         right_paddle_position += 10
                         await self.channel_layer.group_send(
-                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position}}
+                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position, "timestamp": time.time()}}
                         )
-                    else:
+                    elif ball_position["y"] < right_paddle_position + (PADDLE_HEIGHT / 2) and right_paddle_position > 0:
                         right_paddle_position -= 10
                         await self.channel_layer.group_send(
-                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position}}
+                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position, "timestamp": time.time()}}
                         )
                 else:
                     if right_paddle_position > 150:
                         right_paddle_position -= 10
                         await self.channel_layer.group_send(
-                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position}}
+                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position, "timestamp": time.time()}}
                         )
                     elif right_paddle_position < 150:
                         right_paddle_position += 10
                         await self.channel_layer.group_send(
-                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position}}
+                            self.room_group_name, {"type": "send_message", "message":  {"type":"game_state","ball_position": ball_position, "ball_direction": ball_direction, "right_paddle_position": right_paddle_position, "left_paddle_position": left_paddle_position, "timestamp": time.time()}}
                         )
 
             await asyncio.sleep(1/TPS)

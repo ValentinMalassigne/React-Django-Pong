@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams } from "react-router-dom";
+import PongChat from './GameChat';
 
 
 const Pong = () => {
@@ -9,7 +10,7 @@ const Pong = () => {
 	const MAP_WIDTH = 600
 	const BALL_DIAMETER = 20
 	const params = useParams();
-	const initialBallState = { x: 290, y: 190, x_direction: 0, y_direction: 0, last_collision: "" };
+	const initialBallState = { x: 290, y: 190, x_direction: 0, y_direction: 0, last_collision: "", timestamp: 0 };
 	const initialPaddleState = { left: 150, right: 150 };
 	const playerCount = 2;
 	const [ball, setBall] = useState(initialBallState);
@@ -63,16 +64,19 @@ const Pong = () => {
 				setBall(initialBallState);
 				setPaddles(initialPaddleState);
 			} else if (data.type === 'game_state') {
-				const ball_position = data.ball_position;
-				const ball_direction = data.ball_direction;
-				const rightPaddle = data.right_paddle_position;
-				const leftPaddle = data.left_paddle_position;
-				if (Math.abs(ball.x - ball_position.x) > 5 || Math.abs(ball.y - ball_position.y) > 5) {
-					setBall((prevBall) => ({
-						...prevBall, x: ball_position.x, y: ball_position.y, x_direction: ball_direction.x, y_direction: ball_direction.y
-					}));
+				const timestamp = data.timestamp;
+				if (timestamp > ball.timestamp) {
+					const ball_position = data.ball_position;
+					const ball_direction = data.ball_direction;
+					const rightPaddle = data.right_paddle_position;
+					const leftPaddle = data.left_paddle_position;
+					if (Math.abs(ball.x - ball_position.x) > 10 || Math.abs(ball.y - ball_position.y) > 10) {
+						setBall((prevBall) => ({
+							...prevBall, x: ball_position.x, y: ball_position.y, x_direction: ball_direction.x, y_direction: ball_direction.y, timestamp: timestamp
+						}));
+					}
+					setPaddles({ left: leftPaddle, right: rightPaddle });
 				}
-				setPaddles({ left: leftPaddle, right: rightPaddle });
 			} else if (data.type === 'game_over') {
 				setGameRunning(false);
 				setGameOver(true);
@@ -188,6 +192,7 @@ const Pong = () => {
 			/>
 			{gameOver && <div className="game-over">Game Over</div>}
 		</div>
+		{/* <PongChat roomCode={params.roomCode} /> */}
 	</>
 	);
 };

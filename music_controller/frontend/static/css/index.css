@@ -80,6 +80,8 @@ button {
 	cursor: pointer;
 }
 
+/* game chat */
+
 .game-over {
 	width: 600px;
 	height: 400px;
@@ -88,4 +90,13 @@ button {
 	justify-content: center;
 	align-items: center;
 	color: white;
+}
+
+.message-player {
+	color: black;
+}
+
+.message-spectator {
+	color: gray;
+	font-style: italic;
 }
