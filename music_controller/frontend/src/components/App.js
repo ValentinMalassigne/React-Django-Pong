@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { render } from 'react-dom';
 import HomePage from './HomePage';
-import FloatingChat from './FloatingChat';
+import FloatingChat from './chat_module/FloatingChat';
+import { ChatContextProvider } from './chat_module/ChatModuleProvider';
 
 export default class App extends Component {
 	constructor(props) {
@@ -11,13 +12,13 @@ export default class App extends Component {
 	render() {
 		return (
 			<>
+			<ChatContextProvider>
 				<div className='center'>
 					<HomePage />
-
 				</div>
 				<FloatingChat />
+			</ChatContextProvider>
 			</>
-
 		);
 	}
 }

@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import ChatModule from './ChatModule';
+import { useChatContext } from './ChatModuleProvider';
 
 const FloatingChat = () => {
 	const [open, setOpen] = useState(false);
-	const [roomCode, setRoomCode] = useState('global');
+	const { rooms, roomCode, setRoomCode } = useChatContext();
 
 	const toggleOpen = () => setOpen(!open);
 
@@ -42,10 +43,15 @@ const FloatingChat = () => {
 						<button onClick={() => setOpen(false)}>Close</button>
 					</div>
 					<div style={{ position: 'absolute', top: '0', left: '0', padding: '10px', textAlign: 'center', zIndex: '1' }}>
-						{/* Example chat room buttons */}
-						<button onClick={() => setRoomCode("global")}>Global</button>
-						<button onClick={() => setRoomCode("global2")}>Global 2</button>
-						<button onClick={() => setRoomCode("global3")}>Global 3</button>
+						{
+						console.log("rooms: ", rooms)
+						}
+						{
+						rooms.map((room) => (
+							<button key={"button" + room.id} onClick={() => setRoomCode(room.id)}>
+							{room.name}
+							</button>
+						))}
 					</div>
 					<div style={{ position: 'absolute', top: '50px', bottom: '0', left: '0', right: '0', overflowY: 'auto', padding: '10px' }}>
 						<ChatModule key={roomCode} roomCode={roomCode} />

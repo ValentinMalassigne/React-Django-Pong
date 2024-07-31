@@ -1,23 +1,21 @@
-import { createContext, useContext } from 'react';
+import React, { createContext, useContext } from 'react';
+import useChat  from './useChat';
 
 const RoomProps = {
 	id: '',
 	name: '',
+	wssConnection: WebSocket | null,
 	messages: [],
 };
 
-const wssConnectionProps = {
-	wssConnection: WebSocket | null,
-	id: null,
-};
-
-
 const ChatContextProps = {
 	rooms: [],
-	wssConnections: [],
+	roomCode: 'global',
+	setRoomCode: (roomId) => {},
 	connectToRoom: (roomId) => Promise,
 	leaveRoom: (roomId) => Promise,
 	sendMessage: (message, roomId) => Promise,
+	listenToWebsocket: (roomId) => Promise,
 };
 
 const ChatContext = createContext(ChatContextProps);
@@ -25,12 +23,22 @@ const ChatContext = createContext(ChatContextProps);
 export const ChatContextProvider = ({ children }) => {
 	const {
 		rooms,
-		wssConnection,
+		roomCode,
+		setRoomCode,
+		connectToRoom,
+		leaveRoom,
+		sendMessage,
+		listenToWebsocket,
 	} = useChat();
 
 	return <ChatContext.Provider value={{
 		rooms,
-		wssConnection
+		roomCode,
+		setRoomCode,
+		connectToRoom,
+		leaveRoom,
+		sendMessage,
+		listenToWebsocket,
 	}}>{children}</ChatContext.Provider>;
 };
 
